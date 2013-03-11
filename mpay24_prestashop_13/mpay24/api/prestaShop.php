@@ -273,9 +273,10 @@ define("PRESTASHOP_MODULE_VERSION", "Prestashop 1.3");
           		$paymentSystems = explode(",", $this->shopSettings['MPAY24_PAYMENT_SYSTEMS_CHECKED']);
           		
           		foreach($paymentSystems as $paymentSystem){
-	          		$mdxi->Order->PaymentTypes->Payment($i)->setType(explode("=>", $paymentSystem)[1]);
-	          		if(explode("=>", $paymentSystem)[1] != explode("=>", $paymentSystem)[0])
-	          			$mdxi->Order->PaymentTypes->Payment($i)->setBrand(explode("=>", $paymentSystem)[0]);
+          		$x = explode("=>", $paymentSystem);
+	          		$mdxi->Order->PaymentTypes->Payment($i)->setType($x[1]);
+	          		if($x[1] != $x[0])
+	          			$mdxi->Order->PaymentTypes->Payment($i)->setBrand($x[0]);
 	          		$i++;
           		}
           }
