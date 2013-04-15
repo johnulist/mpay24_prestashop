@@ -1,6 +1,6 @@
 <?php
 include_once("MPay24Shop.php");
-define("PRESTASHOP_MODULE_VERSION", "Prestashop 1.3");
+define("PRESTASHOP_MODULE_VERSION", "Prestashop 1.4");
 
     class prestaShop extends MPay24Shop {
 

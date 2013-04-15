@@ -39,7 +39,7 @@ class mpay24 extends PaymentModule {
 	function __construct() {
 		$this->name = 'mpay24';
 		$this->tab = 'payments_gateways';
-		$this->version = 1.3;
+		$this->version = 1.4;
 		$this->author = 'mPAY24 GmbH';
 		$this->module_key = "0305d76041c2475bb5a35f0dcd7236d8";
 
@@ -134,12 +134,12 @@ class mpay24 extends PaymentModule {
 						Configuration::updateValue('MPAY24_PROXY_HOST', $proxy_host);
 						Configuration::updateValue('MPAY24_PROXY_PORT', $proxy_port);
 					}
-					if (!sizeof($errors)){
-						Tools::redirectAdmin($currentIndex.'&configure=mpay24&token='.Tools::getValue('token').'&conf=4
-								&resultStatus='.$result->getGeneralResponse()->getStatus().
-								'&resultReturnCode='.urlencode($result->getGeneralResponse()->getReturnCode()).
-								'&resultAll='.$result->getAll());
-					}
+// 					if (!sizeof($errors)){
+// 						Tools::redirectAdmin($currentIndex.'&configure=mpay24&token='.Tools::getValue('token').'&conf=4
+// 								&resultStatus='.$result->getGeneralResponse()->getStatus().
+// 								'&resultReturnCode='.urlencode($result->getGeneralResponse()->getReturnCode()).
+// 								'&resultAll='.$result->getAll());
+// 					}
 				}
 				else
 					$errors['mpay24'] = "<div class='warn error'' style='color: red;'>".$result->getGeneralResponse()->getReturnCode().'</div>';
@@ -184,15 +184,15 @@ class mpay24 extends PaymentModule {
 			}
 		}
 
-		if (Tools::isSubmit('submitDesignSettings')){
-			foreach($_REQUEST as $key => $value)
-				if(substr($key, 0, 12) == 'MPAY24_ORDER' || substr($key, 0, 9) == 'MPAY24_SC' || substr($key, 0, 21) == 'MPAY24_SHIPPING_COSTS'
-						|| substr($key, 0, 16) == 'MPAY24_SUB_TOTAL' || substr($key, 0, 15) == 'MPAY24_DISCOUNT' || substr($key, 0, 10) == 'MPAY24_TAX'
-						|| substr($key, 0, 11) == 'MPAY24_ITEM' || substr($key, 0, 12) == 'MPAY24_PRICE')
-				Configuration::updateValue($key, $value);
-		}
+// 		if (Tools::isSubmit('submitDesignSettings')){
+// 			foreach($_REQUEST as $key => $value)
+// 				if(substr($key, 0, 12) == 'MPAY24_ORDER' || substr($key, 0, 9) == 'MPAY24_SC' || substr($key, 0, 21) == 'MPAY24_SHIPPING_COSTS'
+// 						|| substr($key, 0, 16) == 'MPAY24_SUB_TOTAL' || substr($key, 0, 15) == 'MPAY24_DISCOUNT' || substr($key, 0, 10) == 'MPAY24_TAX'
+// 						|| substr($key, 0, 11) == 'MPAY24_ITEM' || substr($key, 0, 12) == 'MPAY24_PRICE')
+// 				Configuration::updateValue($key, $value);
+// 		}
 
-		$html = $post.'<h2>'.$this->displayName.'</h2>
+		$this->_html = $post.'<h2>'.$this->displayName.'</h2>
 		<form action="'.$_SERVER['REQUEST_URI'].'" method="post">
 		<fieldset>
 		<legend><img src="'.__PS_BASE_URI__.'modules/mpay24/logo.gif" />'.$this->l('Settings').'</legend>
@@ -204,12 +204,12 @@ class mpay24 extends PaymentModule {
 		<select name="mpay24_test_mode">
 		<option value="false"';
 		if(Configuration::get('MPAY24_TEST_MODE') == 'false')
-			$html.= ' selected="selected"';
-		$html.= '>'.$this->l('Live').'&nbsp;&nbsp;</option>
+			$this->_html.= ' selected="selected"';
+		$this->_html.= '>'.$this->l('Live').'&nbsp;&nbsp;</option>
 		<option value="true"';
 		if(Configuration::get('MPAY24_TEST_MODE') == 'true')
-			$html.= ' selected="selected"';
-		$html.= '>'.$this->l('Test').'&nbsp;&nbsp;</option>
+			$this->_html.= ' selected="selected"';
+		$this->_html.= '>'.$this->l('Test').'&nbsp;&nbsp;</option>
 		</select>
 		</div>
 		<label>
@@ -252,13 +252,13 @@ class mpay24 extends PaymentModule {
 		}
 		
 		if((Tools::isSubmit('submitMpay24Checkout') && $_REQUEST["resultStatus"] == 'OK') || Configuration::get("MPAY24_ACTIVE_PAYMENT_SYSTEMS") != ''){
-			$html.= '<form method="post" action="'.htmlentities($_SERVER['REQUEST_URI']).'">
+			$this->_html.= '<form method="post" action="'.htmlentities($_SERVER['REQUEST_URI']).'">
 			<script type="text/javascript">
 			var pos_select = '.(($tab = (int)Tools::getValue('tabs')) ? $tab : '0').';
-			</script>
-			<script type="text/javascript" src="'._PS_BASE_URL_._PS_JS_DIR_.'tabpane.js"></script>
-			<link type="text/css" rel="stylesheet" href="'._PS_BASE_URL_._PS_CSS_DIR_.'tabpane.css" />
-			<input type="hidden" name="tabs" id="tabs" value="0" />
+			</script>';
+// 			<script type="text/javascript" src="'._PS_BASE_URL_._PS_JS_DIR_.'tabpane.js"></script>
+// 			<link type="text/css" rel="stylesheet" href="'._PS_BASE_URL_._PS_CSS_DIR_.'tabpane.css" />
+			$this->_html.= '<input type="hidden" name="tabs" id="tabs" value="0" />
 			<div class="tab-pane" id="tab-pane-1" style="width:100%;">
 			<div class="tab-page" id="step1">
 			<h4 class="tab"><img src="../img/admin/payment.gif" /> '.$this->l('Activate/deactivate mPAY24 payment systems').'</h2>
@@ -266,13 +266,13 @@ class mpay24 extends PaymentModule {
 			<tr>
 			<td><input type="radio" value="true" name="MPAY24_PAYMENT_SYSTEMS_ENABLED" title="psActive"';
 			if (Configuration::get("MPAY24_PAYMENT_SYSTEMS_ENABLED") == 'true')
-				$html.= ' checked';
-			$html.= '></td>
+				$this->_html.= ' checked';
+			$this->_html.= '></td>
 			<td>'.$this->l('Activate the checked payment systems').'</td>
 			<td><input type="radio" value="false" name="MPAY24_PAYMENT_SYSTEMS_ENABLED" title="psInactive"';
 			if (Configuration::get("MPAY24_PAYMENT_SYSTEMS_ENABLED") == 'false')
-				$html.= ' checked';
-			$html.= '></td>
+				$this->_html.= ' checked';
+			$this->_html.= '></td>
 			<td colspan="2">'.$this->l('Deactivate the checked payment systems').'</td>
 			</tr>
 			<tr>
@@ -280,12 +280,12 @@ class mpay24 extends PaymentModule {
 			<table style="border-spacing: 80px 30px;">';
 			for($i=0; $i<Configuration::get("MPAY24_ALL_ACTIVE_PS"); $i++){
 				if($i % 4 == 0):
-				$html.= '<tr>
+				$this->_html.= '<tr>
 				<td>
 				<div style="clear:both;">
 				<img src="https://www.mpay24.com/web/img/logos/brands/small/'.$brands[$i].'.png"
 				alt="'.$brands[$i].'" title="'.$brands[$i].'"/>';
-				$html.= '<input align="left" type="checkbox" name="ps_'.$brands[$i].'"
+				$this->_html.= '<input align="left" type="checkbox" name="ps_'.$brands[$i].'"
 				value="'.$ptypes[$i].'"';
 				$brandsArray = array();
 				foreach(explode(",", Configuration::get("MPAY24_PAYMENT_SYSTEMS_CHECKED")) as $checkedPS){
@@ -294,16 +294,16 @@ class mpay24 extends PaymentModule {
 					}
 				
 				if(in_array($brands[$i], $brandsArray))
-					$html.= ' checked';
-				$html.= '>
+					$this->_html.= ' checked';
+				$this->_html.= '>
 				</div>
 				</td>';
 				elseif($i % 4 == 1):
-				$html.= '<td>
+				$this->_html.= '<td>
 				<div style="clear:both;">
 				<img src="https://www.mpay24.com/web/img/logos/brands/small/'.$brands[$i].'.png"
 				alt="'.$brands[$i].'" title="'.$brands[$i].'"/>';
-				$html.= '<input align="left" type="checkbox" name="ps_'.$brands[$i].'"
+				$this->_html.= '<input align="left" type="checkbox" name="ps_'.$brands[$i].'"
 				value="'.$ptypes[$i].'"';
 				$brandsArray = array();
 				foreach(explode(",", Configuration::get("MPAY24_PAYMENT_SYSTEMS_CHECKED")) as $checkedPS) {
@@ -312,16 +312,16 @@ class mpay24 extends PaymentModule {
 					}
 				
 				if(in_array($brands[$i], $brandsArray))
-					$html.= ' checked';
-				$html.= '>
+					$this->_html.= ' checked';
+				$this->_html.= '>
 				</div>
 				</td>';
 				elseif($i % 4 == 2):
-				$html.= '<td>
+				$this->_html.= '<td>
 				<div style="clear:both;">
 				<img src="https://www.mpay24.com/web/img/logos/brands/small/'.$brands[$i].'.png"
 				alt="'.$brands[$i].'" title="'.$brands[$i].'"/>';
-				$html.= '<input align="left" type="checkbox" name="ps_'.$brands[$i].'"
+				$this->_html.= '<input align="left" type="checkbox" name="ps_'.$brands[$i].'"
 				value="'.$ptypes[$i].'"';
 				$brandsArray = array();
 				foreach(explode(",", Configuration::get("MPAY24_PAYMENT_SYSTEMS_CHECKED")) as $checkedPS) {
@@ -330,16 +330,16 @@ class mpay24 extends PaymentModule {
 					}
 				
 				if(in_array($brands[$i], $brandsArray))
-					$html.= ' checked';
-				$html.= '>
+					$this->_html.= ' checked';
+				$this->_html.= '>
 				</div>
 				</td> ';
 				elseif($i % 4 == 3):
-				$html.= '<td>
+				$this->_html.= '<td>
 				<div style="clear:both;">
 				<img src="https://www.mpay24.com/web/img/logos/brands/small/'.$brands[$i].'.png"
 				alt="'.$brands[$i].'" title="'.$brands[$i].'"/>';
-				$html.= '<input align="left" type="checkbox" name="ps_'.$brands[$i].'"
+				$this->_html.= '<input align="left" type="checkbox" name="ps_'.$brands[$i].'"
 				value="'.$ptypes[$i].'"';
 				$brandsArray = array();
 				foreach(explode(",", Configuration::get("MPAY24_PAYMENT_SYSTEMS_CHECKED")) as $checkedPS) {
@@ -348,16 +348,16 @@ class mpay24 extends PaymentModule {
 					}
 				
 				if(in_array($brands[$i], $brandsArray))
-					$html.= ' checked';
-				$html.= '>
+					$this->_html.= ' checked';
+				$this->_html.= '>
 				</div>
 				</td>';
 				else:
-				$html.= '<td>
+				$this->_html.= '<td>
 				<div style="clear:both;">
 				<img src="https://www.mpay24.com/web/img/logos/brands/small/'.$brands[$i].'.png"
 				alt="'.$brands[$i].'" title="'.$brands[$i].'"/>';
-				$html.= '<input align="left" type="checkbox" name="ps_'.$brands[$i].'"
+				$this->_html.= '<input align="left" type="checkbox" name="ps_'.$brands[$i].'"
 				value="'.$ptypes[$i].'"';
 				$brandsArray = array();
 				foreach(explode(",", Configuration::get("MPAY24_PAYMENT_SYSTEMS_CHECKED")) as $checkedPS) {
@@ -366,272 +366,272 @@ class mpay24 extends PaymentModule {
 					}
 				
 				if(in_array($brands[$i], $brandsArray))
-					$html.= ' checked';
-				$html.= '>
+					$this->_html.= ' checked';
+				$this->_html.= '>
 				</div>
 				</td>
 				</tr>';
 				endif;
 			}
-			$html.= '</table>
+			$this->_html.= '</table>
 			</td>
 			</tr>
 			<tr>
 			<td>'.$this->l('Billing address mode:').'</td>
 			<td>ReadOnly <input type="radio" value="ReadOnly" name="MPAY24_BILLING_ADDRESS_MODE" title="billingReadOnly"';
 			if (Configuration::get("MPAY24_BILLING_ADDRESS_MODE") == "ReadOnly")
-				$html.= ' checked';
-			$html.= '></td>
+				$this->_html.= ' checked';
+			$this->_html.= '></td>
 			<td colspan="2">ReadWrite <input type="radio" value="ReadWrite" name="MPAY24_BILLING_ADDRESS_MODE" title="billingReadWrite"';
 			if (Configuration::get("MPAY24_BILLING_ADDRESS_MODE") == "ReadWrite")
-				$html.= ' checked';
-			$html.= '></td>
+				$this->_html.= ' checked';
+			$this->_html.= '></td>
 			</tr>
 			</table>
 			<p class="center"><input class="button" type="submit" name="submitPaymentSystems" value="'.$this->l('Save settings').'" /></p>
-			</div>
-			<div class="tab-page" id="step2">
-			<h4 class="tab"><img src="../img/admin/appearance.gif" /> '.$this->l('Design settings for the mPAY24 pay page').'</h2>
-			<fieldset>
-			<legend>Order design settings for the mPAY24 pay page</legend>
-			<table>
-			<tr>
-			<td>Order Description:</td>
-			<td><input size="70" type="text" name="MPAY24_ORDER_DESCR" value="'.Configuration::get("MPAY24_ORDER_DESCR").'"></td>
-			</tr>
-			<tr>
-			<td>Order Style:</td>
-			<td><input size="70" type="text" name="MPAY24_ORDER_S" value="'.Configuration::get("MPAY24_ORDER_S").'"></td>
-			</tr>
-			<tr>
-			<td>Order Logo Style:</td>
-			<td><input size="70" type="text" name="MPAY24_ORDER_LOGO_S" value="'.Configuration::get("MPAY24_ORDER_LOGO_S").'"></td>
-			</tr>
-			<tr>
-			<td>Order Page Header Style:</td>
-			<td><input size="70" type="text" name="MPAY24_ORDER_PAGE_HS" value="'.Configuration::get("MPAY24_ORDER_PAGE_HS").'"></td>
-			</tr>
-			<tr>
-			<td>Order Page Caption Style:</td>
-			<td><input size="70" type="text" name="MPAY24_ORDER_PAGE_CS" value="'.Configuration::get("MPAY24_ORDER_PAGE_CS").'"></td>
-			</tr>
-			<tr>
-			<td>Order Page Style:</td>
-			<td><input size="70" type="text" name="MPAY24_ORDER_PAGE_S" value="'.Configuration::get("MPAY24_ORDER_PAGE_S").'"></td>
-			</tr>
-			<tr>
-			<td>Order Input Fields Style:</td>
-			<td><input size="70" type="text" name="MPAY24_ORDER_IF_S" value="'.Configuration::get("MPAY24_ORDER_IF_S").'"></td>
-			</tr>
-			<tr>
-			<td>Order Drop-Down Lists Style:</td>
-			<td><input size="70" type="text" name="MPAY24_ORDER_DD_LISTS_S" value="'.Configuration::get("MPAY24_ORDER_DD_LISTS_S").'"></td>
-			</tr>
-			<tr>
-			<td>Order Buttons Style:</td>
-			<td><input size="70" type="text" name="MPAY24_ORDER_BUTTONS_S" value="'.Configuration::get("MPAY24_ORDER_BUTTONS_S").'"></td>
-			</tr>
-			<tr>
-			<td>Order Errors Style:</td>
-			<td><input size="70" type="text" name="MPAY24_ORDER_ERRORS_S" value="'.Configuration::get("MPAY24_ORDER_ERRORS_S").'"></td>
-			</tr>
-			<tr>
-			<td>Order Success Title Style:</td>
-			<td><input size="70" type="text" name="MPAY24_ORDER_ST_S" value="'.Configuration::get("MPAY24_ORDER_ST_S").'"></td>
-			</tr>
-			<tr>
-			<td>Order Error Title Style:</td>
-			<td><input size="70" type="text" name="MPAY24_ORDER_ET_S" value="'.Configuration::get("MPAY24_ORDER_ET_S").'"></td>
-			</tr>
-			<tr>
-			<td>Order Footer Style:</td>
-			<td><input size="70" type="text" name="MPAY24_ORDER_FOOTER_S" value="'.Configuration::get("MPAY24_ORDER_FOOTER_S").'"></td>
-			</tr>
-			</table>
-			</fieldset>
-			<br /><br />
-			<fieldset>
-			<legend>Shopping cart design settings for the mPAY24 pay page</legend>
-			<table>
-			<tr>
-			<td>Shopping Cart Header:</td>
-			<td><input size="70" type="text" name="MPAY24_SC_H" value="'.Configuration::get("MPAY24_SC_H").'"></td>
-			</tr>
-			<tr>
-			<td>Shopping Cart Header Style:</td>
-			<td><input size="70" type="text" name="MPAY24_SC_HS" value="'.Configuration::get("MPAY24_SC_HS").'"></td>
-			</tr>
-			<tr>
-			<td>Shopping Cart Style:</td>
-			<td><input size="70" type="text" name="MPAY24_SC_S" value="'.Configuration::get("MPAY24_SC_S").'"></td>
-			</tr>
-			<tr>
-			<td>Shopping Cart Caption Style:</td>
-			<td><input size="70" type="text" name="MPAY24_SC_CS" value="'.Configuration::get("MPAY24_SC_CS").'"></td>
-			</tr>
-			<tr>
-			<td>Shopping Cart Number Header:</td>
-			<td><input size="70" type="text" name="MPAY24_SC_NUMBER_H" value="'.Configuration::get("MPAY24_SC_NUMBER_H").'"></td>
-			</tr>
-			<tr>
-			<td>Shopping Cart Number Style:</td>
-			<td><input size="70" type="text" name="MPAY24_SC_NUMBER_S" value="'.Configuration::get("MPAY24_SC_NUMBER_S").'"></td>
-			</tr>
-			<tr>
-			<td>Shopping Cart Product Number Header:</td>
-			<td><input size="70" type="text" name="MPAY24_SC_PRODUCT_NUMBER_H" value="'.Configuration::get("MPAY24_SC_PRODUCT_NUMBER_H").'"></td>
-			</tr>
-			<tr>
-			<td>Shopping Cart Product Number Style:</td>
-			<td><input size="70" type="text" name="MPAY24_SC_PRODUCT_NUMBER_S" value="'.Configuration::get("MPAY24_SC_PRODUCT_NUMBER_S").'"></td>
-			</tr>
-			<tr>
-			<td>Shopping Cart Description Header:</td>
-			<td><input size="70" type="text" name="MPAY24_SC_DESCRIPTION_H" value="'.Configuration::get("MPAY24_SC_DESCRIPTION_H").'"></td>
-			</tr>
-			<tr>
-			<td>Shopping Cart Description Style:</td>
-			<td><input size="70" type="text" name="MPAY24_SC_DESCRIPTION_S" value="'.Configuration::get("MPAY24_SC_DESCRIPTION_S").'"></td>
-			</tr>
-			<tr>
-			<td>Shopping Cart Package Header:</td>
-			<td><input size="70" type="text" name="MPAY24_SC_PACKAGE_H" value="'.Configuration::get("MPAY24_SC_PACKAGE_H").'"></td>
-			</tr>
-			<tr>
-			<td>Shopping Cart Package Style:</td>
-			<td><input size="70" type="text" name="MPAY24_SC_PACKAGE_S" value="'.Configuration::get("MPAY24_SC_PACKAGE_S").'"></td>
-			</tr>
-			<tr>
-			<td>Shopping Cart Quantity Header:</td>
-			<td><input size="70" type="text" name="MPAY24_SC_QUANTITY_H" value="'.Configuration::get("MPAY24_SC_QUANTITY_H").'"></td>
-			</tr>
-			<tr>
-			<td>Shopping Cart Quantity Style:</td>
-			<td><input size="70" type="text" name="MPAY24_SC_QUANTITY_S" value="'.Configuration::get("MPAY24_SC_QUANTITY_S").'"></td>
-			</tr>
-			<tr>
-			<td>Shopping Cart Item Price Header:</td>
-			<td><input size="70" type="text" name="MPAY24_SC_ITEM_PRICE_H" value="'.Configuration::get("MPAY24_SC_ITEM_PRICE_H").'"></td>
-			</tr>
-			<tr>
-			<td>Shopping Cart Item Price Style:</td>
-			<td><input size="70" type="text" name="MPAY24_SC_ITEM_PRICE_S" value="'.Configuration::get("MPAY24_SC_ITEM_PRICE_S").'"></td>
-			</tr>
-			<tr>
-			<td>Shopping Cart Price Header:</td>
-			<td><input size="70" type="text" name="MPAY24_SC_PRICE_H" value="'.Configuration::get("MPAY24_SC_PRICE_H").'"></td>
-			</tr>
-			<tr>
-			<td>Shopping Cart Price Style:</td>
-			<td><input size="70" type="text" name=MPAY24_SC_PRICE_S value="'.Configuration::get("MPAY24_SC_PRICE_S").'"></td>
-			</tr>
-			</table>
-			</fieldset>
-			<br /><br />
-			<fieldset>
-			<legend>Other costs esign settings for the mPAY24 pay page</legend>
-			<table>
-			<tr>
-			<td>Sub Total Header:</td>
-			<td><input size="70" type="text" name="MPAY24_SUB_TOTAL_H" value="'.Configuration::get("MPAY24_SUB_TOTAL_H").'"></td>
-			</tr>
-			<tr>
-			<td>Sub Total Header Style:</td>
-			<td><input size="70" type="text" name="MPAY24_SUB_TOTAL_HS" value="'.Configuration::get("MPAY24_SUB_TOTAL_HS").'"></td>
-			</tr>
-			<tr>
-			<td>Sub Total Style:</td>
-			<td><input size="70" type="text" name="MPAY24_SUB_TOTAL_S" value="'.Configuration::get("MPAY24_SUB_TOTAL_S").'"></td>
-			</tr>
-			<tr>
-			<td>Discount Header:</td>
-			<td><input size="70" type="text" name="MPAY24_DISCOUNT_H" value="'.Configuration::get("MPAY24_DISCOUNT_H").'"></td>
-			</tr>
-			<tr>
-			<td>Discount Header Style:</td>
-			<td><input size="70" type="text" name="MPAY24_DISCOUNT_HS" value="'.Configuration::get("MPAY24_DISCOUNT_HS").'"></td>
-			</tr>
-			<tr>
-			<td>Discount Style:</td>
-			<td><input size="70" type="text" name="MPAY24_DISCOUNT_S" value="'.Configuration::get("MPAY24_DISCOUNT_S").'"></td>
-			</tr>
-			<tr>
-			<td>Shipping Costs Header:</td>
-			<td><input size="70" type="text" name="MPAY24_SHIPPING_COSTS_H" value="'.Configuration::get("MPAY24_SHIPPING_COSTS_H").'"></td>
-			</tr>
-			<tr>
-			<td>Shipping Costs Header Style:</td>
-			<td><input size="70" type="text" name="MPAY24_SHIPPING_COSTS_HS" value="'.Configuration::get("MPAY24_SHIPPING_COSTS_HS").'"></td>
-			</tr>
-			<tr>
-			<td>Shipping Costs Style:</td>
-			<td><input size="70" type="text" name="MPAY24_SHIPPING_COSTS_S" value="'.Configuration::get("MPAY24_SHIPPING_COSTS_S").'"></td>
-			</tr>
-			<tr>
-			<td>Tax Header:</td>
-			<td><input size="70" type="text" name="MPAY24_TAX_H" value="'.Configuration::get("MPAY24_TAX_H").'"></td>
-			</tr>
-			<tr>
-			<td>Tax Header Style:</td>
-			<td><input size="70" type="text" name="MPAY24_TAX_HS" value="'.Configuration::get("MPAY24_TAX_HS").'"></td>
-			</tr>
-			<tr>
-			<td>Tax Style:</td>
-			<td><input size="70" type="text" name="MPAY24_TAX_S" value="'.Configuration::get("MPAY24_TAX_S").'"></td>
-			</tr>
-			<tr>
-			<td>Item Number Style:</td>
-			<td><input size="70" type="text" name="MPAY24_ITEM_NUMBER_S" value="'.Configuration::get("MPAY24_ITEM_NUMBER_S").'"></td>
-			</tr>
-			<tr>
-			<td>Item Product Number Style:</td>
-			<td><input size="70" type="text" name="MPAY24_ITEM_PRODUCT_NUMBER_S" value="'.Configuration::get("MPAY24_ITEM_PRODUCT_NUMBER_S").'"></td>
-			</tr>
-			<tr>
-			<td>Item Description Style:</td>
-			<td><input size="70" type="text" name="MPAY24_ITEM_DESCRIPTION_S" value="'.Configuration::get("MPAY24_ITEM_DESCRIPTION_S").'"></td>
-			</tr>
-			<tr>
-			<td>Item Package Style:</td>
-			<td><input size="70" type="text" name="MPAY24_ITEM_PACKAGE_S" value="'.Configuration::get("MPAY24_ITEM_PACKAGE_S").'"></td>
-			</tr>
-			<tr>
-			<td>Item Quantity Style:</td>
-			<td><input size="70" type="text" name="MPAY24_ITEM_QUANTITY_S" value="'.Configuration::get("MPAY24_ITEM_QUANTITY_S").'"></td>
-			</tr>
-			<tr>
-			<td>Item Item Price Style:</td>
-			<td><input size="70" type="text" name="MPAY24_ITEM_ITEM_PRICE_S" value="'.Configuration::get("MPAY24_ITEM_ITEM_PRICE_S").'"></td>
-			</tr>
-			<tr>
-			<td>Item Price Style:</td>
-			<td><input size="70" type="text" name="MPAY24_ITEM_PRICE_S" value="'.Configuration::get("MPAY24_ITEM_PRICE_S").'"></td>
-			</tr>
-			<tr>
-			<td>Item Style Odd:</td>
-			<td><input size="70" type="text" name="MPAY24_ITEM_ITEM_PRICE_S_ODD" value="'.Configuration::get("MPAY24_ITEM_ITEM_PRICE_S_ODD").'"></td>
-			</tr>
-			<tr>
-			<td>Item Style Even:</td>
-			<td><input size="70" type="text" name="MPAY24_ITEM_ITEM_PRICE_S_EVEN" value="'.Configuration::get("MPAY24_ITEM_ITEM_PRICE_S_EVEN").'"></td>
-			</tr>
-			<tr>
-			<td>Price Header:</td>
-			<td><input size="70" type="text" name="MPAY24_PRICE_H" value="'.Configuration::get("MPAY24_PRICE_H").'"></td>
-			</tr>
-			<tr>
-			<td>Price Header Style:</td>
-			<td><input size="70" type="text" name="MPAY24_PRICE_HS" value="'.Configuration::get("MPAY24_PRICE_HS").'"></td>
-			</tr>
-			<tr>
-			<td>Price Style:</td>
-			<td><input size="70" type="text" name="MPAY24_PRICE_S" value="'.Configuration::get("MPAY24_PRICE_S").'"></td>
-			</tr>
-			</table>
-			</fieldset>
-			<p class="center"><input class="button" type="submit" name="submitDesignSettings" value="'.$this->l('Save settings').'" /></p>
-			</div>
-			</div>
+			</div>';
+// 			<div class="tab-page" id="step2">
+// 			<h4 class="tab"><img src="../img/admin/appearance.gif" /> '.$this->l('Design settings for the mPAY24 pay page').'</h2>
+// 			<fieldset>
+// 			<legend>Order design settings for the mPAY24 pay page</legend>
+// 			<table>
+// 			<tr>
+// 			<td>Order Description:</td>
+// 			<td><input size="70" type="text" name="MPAY24_ORDER_DESCR" value="'.Configuration::get("MPAY24_ORDER_DESCR").'"></td>
+// 			</tr>
+// 			<tr>
+// 			<td>Order Style:</td>
+// 			<td><input size="70" type="text" name="MPAY24_ORDER_S" value="'.Configuration::get("MPAY24_ORDER_S").'"></td>
+// 			</tr>
+// 			<tr>
+// 			<td>Order Logo Style:</td>
+// 			<td><input size="70" type="text" name="MPAY24_ORDER_LOGO_S" value="'.Configuration::get("MPAY24_ORDER_LOGO_S").'"></td>
+// 			</tr>
+// 			<tr>
+// 			<td>Order Page Header Style:</td>
+// 			<td><input size="70" type="text" name="MPAY24_ORDER_PAGE_HS" value="'.Configuration::get("MPAY24_ORDER_PAGE_HS").'"></td>
+// 			</tr>
+// 			<tr>
+// 			<td>Order Page Caption Style:</td>
+// 			<td><input size="70" type="text" name="MPAY24_ORDER_PAGE_CS" value="'.Configuration::get("MPAY24_ORDER_PAGE_CS").'"></td>
+// 			</tr>
+// 			<tr>
+// 			<td>Order Page Style:</td>
+// 			<td><input size="70" type="text" name="MPAY24_ORDER_PAGE_S" value="'.Configuration::get("MPAY24_ORDER_PAGE_S").'"></td>
+// 			</tr>
+// 			<tr>
+// 			<td>Order Input Fields Style:</td>
+// 			<td><input size="70" type="text" name="MPAY24_ORDER_IF_S" value="'.Configuration::get("MPAY24_ORDER_IF_S").'"></td>
+// 			</tr>
+// 			<tr>
+// 			<td>Order Drop-Down Lists Style:</td>
+// 			<td><input size="70" type="text" name="MPAY24_ORDER_DD_LISTS_S" value="'.Configuration::get("MPAY24_ORDER_DD_LISTS_S").'"></td>
+// 			</tr>
+// 			<tr>
+// 			<td>Order Buttons Style:</td>
+// 			<td><input size="70" type="text" name="MPAY24_ORDER_BUTTONS_S" value="'.Configuration::get("MPAY24_ORDER_BUTTONS_S").'"></td>
+// 			</tr>
+// 			<tr>
+// 			<td>Order Errors Style:</td>
+// 			<td><input size="70" type="text" name="MPAY24_ORDER_ERRORS_S" value="'.Configuration::get("MPAY24_ORDER_ERRORS_S").'"></td>
+// 			</tr>
+// 			<tr>
+// 			<td>Order Success Title Style:</td>
+// 			<td><input size="70" type="text" name="MPAY24_ORDER_ST_S" value="'.Configuration::get("MPAY24_ORDER_ST_S").'"></td>
+// 			</tr>
+// 			<tr>
+// 			<td>Order Error Title Style:</td>
+// 			<td><input size="70" type="text" name="MPAY24_ORDER_ET_S" value="'.Configuration::get("MPAY24_ORDER_ET_S").'"></td>
+// 			</tr>
+// 			<tr>
+// 			<td>Order Footer Style:</td>
+// 			<td><input size="70" type="text" name="MPAY24_ORDER_FOOTER_S" value="'.Configuration::get("MPAY24_ORDER_FOOTER_S").'"></td>
+// 			</tr>
+// 			</table>
+// 			</fieldset>
+// 			<br /><br />
+// 			<fieldset>
+// 			<legend>Shopping cart design settings for the mPAY24 pay page</legend>
+// 			<table>
+// 			<tr>
+// 			<td>Shopping Cart Header:</td>
+// 			<td><input size="70" type="text" name="MPAY24_SC_H" value="'.Configuration::get("MPAY24_SC_H").'"></td>
+// 			</tr>
+// 			<tr>
+// 			<td>Shopping Cart Header Style:</td>
+// 			<td><input size="70" type="text" name="MPAY24_SC_HS" value="'.Configuration::get("MPAY24_SC_HS").'"></td>
+// 			</tr>
+// 			<tr>
+// 			<td>Shopping Cart Style:</td>
+// 			<td><input size="70" type="text" name="MPAY24_SC_S" value="'.Configuration::get("MPAY24_SC_S").'"></td>
+// 			</tr>
+// 			<tr>
+// 			<td>Shopping Cart Caption Style:</td>
+// 			<td><input size="70" type="text" name="MPAY24_SC_CS" value="'.Configuration::get("MPAY24_SC_CS").'"></td>
+// 			</tr>
+// 			<tr>
+// 			<td>Shopping Cart Number Header:</td>
+// 			<td><input size="70" type="text" name="MPAY24_SC_NUMBER_H" value="'.Configuration::get("MPAY24_SC_NUMBER_H").'"></td>
+// 			</tr>
+// 			<tr>
+// 			<td>Shopping Cart Number Style:</td>
+// 			<td><input size="70" type="text" name="MPAY24_SC_NUMBER_S" value="'.Configuration::get("MPAY24_SC_NUMBER_S").'"></td>
+// 			</tr>
+// 			<tr>
+// 			<td>Shopping Cart Product Number Header:</td>
+// 			<td><input size="70" type="text" name="MPAY24_SC_PRODUCT_NUMBER_H" value="'.Configuration::get("MPAY24_SC_PRODUCT_NUMBER_H").'"></td>
+// 			</tr>
+// 			<tr>
+// 			<td>Shopping Cart Product Number Style:</td>
+// 			<td><input size="70" type="text" name="MPAY24_SC_PRODUCT_NUMBER_S" value="'.Configuration::get("MPAY24_SC_PRODUCT_NUMBER_S").'"></td>
+// 			</tr>
+// 			<tr>
+// 			<td>Shopping Cart Description Header:</td>
+// 			<td><input size="70" type="text" name="MPAY24_SC_DESCRIPTION_H" value="'.Configuration::get("MPAY24_SC_DESCRIPTION_H").'"></td>
+// 			</tr>
+// 			<tr>
+// 			<td>Shopping Cart Description Style:</td>
+// 			<td><input size="70" type="text" name="MPAY24_SC_DESCRIPTION_S" value="'.Configuration::get("MPAY24_SC_DESCRIPTION_S").'"></td>
+// 			</tr>
+// 			<tr>
+// 			<td>Shopping Cart Package Header:</td>
+// 			<td><input size="70" type="text" name="MPAY24_SC_PACKAGE_H" value="'.Configuration::get("MPAY24_SC_PACKAGE_H").'"></td>
+// 			</tr>
+// 			<tr>
+// 			<td>Shopping Cart Package Style:</td>
+// 			<td><input size="70" type="text" name="MPAY24_SC_PACKAGE_S" value="'.Configuration::get("MPAY24_SC_PACKAGE_S").'"></td>
+// 			</tr>
+// 			<tr>
+// 			<td>Shopping Cart Quantity Header:</td>
+// 			<td><input size="70" type="text" name="MPAY24_SC_QUANTITY_H" value="'.Configuration::get("MPAY24_SC_QUANTITY_H").'"></td>
+// 			</tr>
+// 			<tr>
+// 			<td>Shopping Cart Quantity Style:</td>
+// 			<td><input size="70" type="text" name="MPAY24_SC_QUANTITY_S" value="'.Configuration::get("MPAY24_SC_QUANTITY_S").'"></td>
+// 			</tr>
+// 			<tr>
+// 			<td>Shopping Cart Item Price Header:</td>
+// 			<td><input size="70" type="text" name="MPAY24_SC_ITEM_PRICE_H" value="'.Configuration::get("MPAY24_SC_ITEM_PRICE_H").'"></td>
+// 			</tr>
+// 			<tr>
+// 			<td>Shopping Cart Item Price Style:</td>
+// 			<td><input size="70" type="text" name="MPAY24_SC_ITEM_PRICE_S" value="'.Configuration::get("MPAY24_SC_ITEM_PRICE_S").'"></td>
+// 			</tr>
+// 			<tr>
+// 			<td>Shopping Cart Price Header:</td>
+// 			<td><input size="70" type="text" name="MPAY24_SC_PRICE_H" value="'.Configuration::get("MPAY24_SC_PRICE_H").'"></td>
+// 			</tr>
+// 			<tr>
+// 			<td>Shopping Cart Price Style:</td>
+// 			<td><input size="70" type="text" name=MPAY24_SC_PRICE_S value="'.Configuration::get("MPAY24_SC_PRICE_S").'"></td>
+// 			</tr>
+// 			</table>
+// 			</fieldset>
+// 			<br /><br />
+// 			<fieldset>
+// 			<legend>Other costs esign settings for the mPAY24 pay page</legend>
+// 			<table>
+// 			<tr>
+// 			<td>Sub Total Header:</td>
+// 			<td><input size="70" type="text" name="MPAY24_SUB_TOTAL_H" value="'.Configuration::get("MPAY24_SUB_TOTAL_H").'"></td>
+// 			</tr>
+// 			<tr>
+// 			<td>Sub Total Header Style:</td>
+// 			<td><input size="70" type="text" name="MPAY24_SUB_TOTAL_HS" value="'.Configuration::get("MPAY24_SUB_TOTAL_HS").'"></td>
+// 			</tr>
+// 			<tr>
+// 			<td>Sub Total Style:</td>
+// 			<td><input size="70" type="text" name="MPAY24_SUB_TOTAL_S" value="'.Configuration::get("MPAY24_SUB_TOTAL_S").'"></td>
+// 			</tr>
+// 			<tr>
+// 			<td>Discount Header:</td>
+// 			<td><input size="70" type="text" name="MPAY24_DISCOUNT_H" value="'.Configuration::get("MPAY24_DISCOUNT_H").'"></td>
+// 			</tr>
+// 			<tr>
+// 			<td>Discount Header Style:</td>
+// 			<td><input size="70" type="text" name="MPAY24_DISCOUNT_HS" value="'.Configuration::get("MPAY24_DISCOUNT_HS").'"></td>
+// 			</tr>
+// 			<tr>
+// 			<td>Discount Style:</td>
+// 			<td><input size="70" type="text" name="MPAY24_DISCOUNT_S" value="'.Configuration::get("MPAY24_DISCOUNT_S").'"></td>
+// 			</tr>
+// 			<tr>
+// 			<td>Shipping Costs Header:</td>
+// 			<td><input size="70" type="text" name="MPAY24_SHIPPING_COSTS_H" value="'.Configuration::get("MPAY24_SHIPPING_COSTS_H").'"></td>
+// 			</tr>
+// 			<tr>
+// 			<td>Shipping Costs Header Style:</td>
+// 			<td><input size="70" type="text" name="MPAY24_SHIPPING_COSTS_HS" value="'.Configuration::get("MPAY24_SHIPPING_COSTS_HS").'"></td>
+// 			</tr>
+// 			<tr>
+// 			<td>Shipping Costs Style:</td>
+// 			<td><input size="70" type="text" name="MPAY24_SHIPPING_COSTS_S" value="'.Configuration::get("MPAY24_SHIPPING_COSTS_S").'"></td>
+// 			</tr>
+// 			<tr>
+// 			<td>Tax Header:</td>
+// 			<td><input size="70" type="text" name="MPAY24_TAX_H" value="'.Configuration::get("MPAY24_TAX_H").'"></td>
+// 			</tr>
+// 			<tr>
+// 			<td>Tax Header Style:</td>
+// 			<td><input size="70" type="text" name="MPAY24_TAX_HS" value="'.Configuration::get("MPAY24_TAX_HS").'"></td>
+// 			</tr>
+// 			<tr>
+// 			<td>Tax Style:</td>
+// 			<td><input size="70" type="text" name="MPAY24_TAX_S" value="'.Configuration::get("MPAY24_TAX_S").'"></td>
+// 			</tr>
+// 			<tr>
+// 			<td>Item Number Style:</td>
+// 			<td><input size="70" type="text" name="MPAY24_ITEM_NUMBER_S" value="'.Configuration::get("MPAY24_ITEM_NUMBER_S").'"></td>
+// 			</tr>
+// 			<tr>
+// 			<td>Item Product Number Style:</td>
+// 			<td><input size="70" type="text" name="MPAY24_ITEM_PRODUCT_NUMBER_S" value="'.Configuration::get("MPAY24_ITEM_PRODUCT_NUMBER_S").'"></td>
+// 			</tr>
+// 			<tr>
+// 			<td>Item Description Style:</td>
+// 			<td><input size="70" type="text" name="MPAY24_ITEM_DESCRIPTION_S" value="'.Configuration::get("MPAY24_ITEM_DESCRIPTION_S").'"></td>
+// 			</tr>
+// 			<tr>
+// 			<td>Item Package Style:</td>
+// 			<td><input size="70" type="text" name="MPAY24_ITEM_PACKAGE_S" value="'.Configuration::get("MPAY24_ITEM_PACKAGE_S").'"></td>
+// 			</tr>
+// 			<tr>
+// 			<td>Item Quantity Style:</td>
+// 			<td><input size="70" type="text" name="MPAY24_ITEM_QUANTITY_S" value="'.Configuration::get("MPAY24_ITEM_QUANTITY_S").'"></td>
+// 			</tr>
+// 			<tr>
+// 			<td>Item Item Price Style:</td>
+// 			<td><input size="70" type="text" name="MPAY24_ITEM_ITEM_PRICE_S" value="'.Configuration::get("MPAY24_ITEM_ITEM_PRICE_S").'"></td>
+// 			</tr>
+// 			<tr>
+// 			<td>Item Price Style:</td>
+// 			<td><input size="70" type="text" name="MPAY24_ITEM_PRICE_S" value="'.Configuration::get("MPAY24_ITEM_PRICE_S").'"></td>
+// 			</tr>
+// 			<tr>
+// 			<td>Item Style Odd:</td>
+// 			<td><input size="70" type="text" name="MPAY24_ITEM_ITEM_PRICE_S_ODD" value="'.Configuration::get("MPAY24_ITEM_ITEM_PRICE_S_ODD").'"></td>
+// 			</tr>
+// 			<tr>
+// 			<td>Item Style Even:</td>
+// 			<td><input size="70" type="text" name="MPAY24_ITEM_ITEM_PRICE_S_EVEN" value="'.Configuration::get("MPAY24_ITEM_ITEM_PRICE_S_EVEN").'"></td>
+// 			</tr>
+// 			<tr>
+// 			<td>Price Header:</td>
+// 			<td><input size="70" type="text" name="MPAY24_PRICE_H" value="'.Configuration::get("MPAY24_PRICE_H").'"></td>
+// 			</tr>
+// 			<tr>
+// 			<td>Price Header Style:</td>
+// 			<td><input size="70" type="text" name="MPAY24_PRICE_HS" value="'.Configuration::get("MPAY24_PRICE_HS").'"></td>
+// 			</tr>
+// 			<tr>
+// 			<td>Price Style:</td>
+// 			<td><input size="70" type="text" name="MPAY24_PRICE_S" value="'.Configuration::get("MPAY24_PRICE_S").'"></td>
+// 			</tr>
+// 			</table>
+// 			</fieldset>
+// 			<p class="center"><input class="button" type="submit" name="submitDesignSettings" value="'.$this->l('Save settings').'" /></p>
+// 			</div>
+			$this->_html .= '</div>
 			<div class="clear"></div>
 			<script type="text/javascript">
 			function loadTab(id){}
@@ -639,7 +639,7 @@ class mpay24 extends PaymentModule {
 			</script>
 			</form>';
 		}
-		return $html;
+		return $this->_html;
 	}
 
 	public function uninstall() {
@@ -690,7 +690,7 @@ class mpay24 extends PaymentModule {
 		$maxAmount2 = $this->l(' is ');
 
 		$msg = "";
-		$html = "<SCRIPT LANGUAGE=\"JavaScript\">
+		$this->_html = "<SCRIPT LANGUAGE=\"JavaScript\">
 		function checkAmount(maxAmount, operation){
 		var amount=document.getElementsByName('postedAmount')[0].value;
 		var fmaxAmount = parseFloat(maxAmount);
@@ -730,13 +730,13 @@ class mpay24 extends PaymentModule {
 		 
 		$module = Db::getInstance()->getRow(' SELECT `module` FROM '._DB_PREFIX_.'orders WHERE `id_order` = '.intval($params['id_order']));
 
-		$html .= "<table style='width: 100%'>
+		$this->_html .= "<table style='width: 100%'>
 		<colgroup>
 		<col width='50%'>
 		<col width='50%'>
 		</colgroup><tr><td>";
 
-		$html .= '<br />
+		$this->_html .= '<br />
 		<fieldset style="min-height: 210px;">
 		<legend>'.$this->l('mPAY24 API').'</legend><br>';
 		if ($module['module'] == 'mpay24') {
@@ -783,8 +783,8 @@ class mpay24 extends PaymentModule {
 			}
 
 			if (isset($_GET['error']))
-				$html .= '<h2><font color="#FF0000">'.urldecode($_GET['error']).'</font></h2>';
-			$html .= '
+				$this->_html .= '<h2><font color="#FF0000">'.urldecode($_GET['error']).'</font></h2>';
+			$this->_html .= '
 			'.$this->l('State:').'
 			';
 			switch($trans['STATUS']){
@@ -836,21 +836,21 @@ class mpay24 extends PaymentModule {
 					<center><input type="submit" name="updateStatus" value="'.$this->l('Update transaction status').'" class="button"/></center></form>';
 					break;
 			}
-			$html .= ''.$msg.'';
+			$this->_html .= ''.$msg.'';
 		}
-		else { $html .= ''.$this->l('No transactions for this order.').'<br>';
+		else { $this->_html .= ''.$this->l('No transactions for this order.').'<br>';
 		}
 		if($mode)
-			$html .= '<br><a href="https://test.mpay24.com/web/de/mpay24-zahlungsloesung.html" target="_blank" style="color: blue;">'.$this->l('mPAY24 Merchant Interface').' - TEST</a></fieldset>';
+			$this->_html .= '<br><a href="https://test.mpay24.com/web/de/mpay24-zahlungsloesung.html" target="_blank" style="color: blue;">'.$this->l('mPAY24 Merchant Interface').' - TEST</a></fieldset>';
 		else
-			$html .= '<br><a href="https://www.mpay24.com/web/de/mpay24-zahlungsloesung.html" target="_blank" style="color: blue;">'.$this->l('mPAY24 Merchant Interface').'</a></fieldset>';
+			$this->_html .= '<br><a href="https://www.mpay24.com/web/de/mpay24-zahlungsloesung.html" target="_blank" style="color: blue;">'.$this->l('mPAY24 Merchant Interface').'</a></fieldset>';
 
-		$html .= "</td><td>";
+		$this->_html .= "</td><td>";
 
 		$id_order = $params['id_order'];
 		$mpay24OrderDetails = $this->readMpay24OrderDetails($id_order);
 
-		$html .= "<br/><fieldset style='min-height: 210px;'>
+		$this->_html .= "<br/><fieldset style='min-height: 210px;'>
 		<legend> ".$this->l('MPAY24 transaction information')." </legend>
 		<div id='info'>
 		<table>
@@ -878,8 +878,8 @@ class mpay24 extends PaymentModule {
 		</div>
 		</fieldset>";
 
-		$html .= "</td></tr></table>";
-		return $html;
+		$this->_html .= "</td></tr></table>";
+		return $this->_html;
 	}
 
 	public function execPayment($cart) {
