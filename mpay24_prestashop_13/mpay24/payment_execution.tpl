@@ -11,7 +11,7 @@
 {assign var='current_step' value='payment'}
 {include file="$tpl_dir./order-steps.tpl"}
 <form action="{$this_path_ssl}submit.php" method="post">
-<p>{debug}
+<p>
     <img src="https://www.mpay24.com//web/img/logos/payment-mpay24.png" alt="{l s='mPAY24' mod='mpay24'}" style="margin-bottom: 5px" />
     <br />{l s='You have chosen to pay with mPAY24.' mod='mpay24'}
     <br /><br />{l s='Your payment will be processed securely through the award winning and PCI certified payment service provider mPAY24 GmbH.' mod='mpay24'}
