@@ -25,7 +25,13 @@ include_once("api/prestaShop.php");
         else
             $mode = false;
            
-        $prestaShop = new prestaShop(Configuration::get('MPAY24_MERCHANT_ID'), Configuration::get('MPAY24_SOAP_PASS'), $mode, Configuration::get('MPAY24_PROXY_HOST'), Configuration::get('MPAY24_PROXY_PORT'));
+        $debug = Configuration::get('MPAY24_DEBUG');
+        if ($debug == "true")
+        	$debug = true;
+        else
+        	$debug = false;
+        
+        $prestaShop = new prestaShop(Configuration::get('MPAY24_MERCHANT_ID'), Configuration::get('MPAY24_SOAP_PASS'), $mode, Configuration::get('MPAY24_PROXY_HOST'), Configuration::get('MPAY24_PROXY_PORT'), $debug);
         $prestaShop->setCustomer(new Customer((int)$_REQUEST['customerID']), $_REQUEST['cartID']);
         $result = $prestaShop->confirm($_REQUEST['TID'], $args);
 ?>

@@ -112,11 +112,19 @@ class mpay24 extends PaymentModule {
 				$mode = true;
 			else
 				$mode = false;
+			
+			$debug = Tools::getValue('mpay24_debug');
+			if ($debug == "true")
+				$debug = true;
+			else
+				$debug = false;
+			
 			Configuration::updateValue('MPAY24_TEST_MODE', Tools::getValue('mpay24_test_mode'));
+			Configuration::updateValue('MPAY24_DEBUG', Tools::getValue('mpay24_debug'));
 			if (($merchant_id = Tools::getValue('mpay24_merchant_id')) AND (preg_match('/7[0-9]{4}/', $merchant_id)
 					OR preg_match('/9[0-9]{4}/', $merchant_id))){
 
-				$prestaShop = new prestaShop($merchant_id, Tools::getValue('mpay24_soap_pass'), $mode, Tools::getValue('mpay24_proxy_host'), Tools::getValue('mpay24_proxy_port'));
+				$prestaShop = new prestaShop($merchant_id, Tools::getValue('mpay24_soap_pass'), $mode, Tools::getValue('mpay24_proxy_host'), Tools::getValue('mpay24_proxy_port'), $debug);
 				$result = $prestaShop->getPaymentMethods();
 				$mpay24PaymentSystems = '';
 				for($i=0; $i<$result->getAll(); $i++){
@@ -223,6 +231,21 @@ class mpay24 extends PaymentModule {
 		</label>
 		<div class="margin-form">
 		<input type="password" name="mpay24_soap_pass" value="'.Tools::getValue('mpay24_soap_pass', Configuration::get('MPAY24_SOAP_PASS')).'" />
+		</div>
+		<label>
+		'.$this->l('Debug').'
+		</label>
+		<div class="margin-form">
+		<select name="mpay24_debug">
+		<option value="false"';
+		if(Configuration::get('MPAY24_DEBUG') == 'false')
+			$this->_html.= ' selected="selected"';
+		$this->_html.= '>'.$this->l('No').'&nbsp;&nbsp;</option>
+		<option value="true"';
+		if(Configuration::get('MPAY24_DEBUG') == 'true')
+			$this->_html.= ' selected="selected"';
+		$this->_html.= '>'.$this->l('Yes').'&nbsp;&nbsp;</option>
+		</select>
 		</div>
 		<p>'.$this->l('In case your server is behind a proxy you should give the proxy host and port.').'</p>
 		<label>
@@ -649,6 +672,7 @@ class mpay24 extends PaymentModule {
 		Configuration::deleteByName('MPAY24_TEST_MODE');
 		Configuration::deleteByName('MPAY24_PROXY_HOST');
 		Configuration::deleteByName('MPAY24_PROXY_PORT');
+		Configuration::deleteByName('MPAY24_DEBUG');
 		Configuration::deleteByName('MPAY24_BILLING_ADDRESS_MODE');
 		Configuration::deleteByName('MPAY24_ACTIVE_PAYMENT_SYSTEMS');
 		Configuration::deleteByName('MPAY24_PAYMENT_SYSTEMS_CHECKED');
@@ -719,8 +743,14 @@ class mpay24 extends PaymentModule {
 			$mode = true;
 		else
 			$mode = false;
+		
+		$debug = Configuration::get('MPAY24_DEBUG') == 'true';
+		if ($debug == "true")
+			$debug = true;
+		else
+			$debug = false;
 
-		$prestaShop = new prestaShop(Configuration::get('MPAY24_MERCHANT_ID'), Configuration::get('MPAY24_SOAP_PASS'), $mode, Configuration::get('MPAY24_PROXY_HOST'), Configuration::get('MPAY24_PROXY_PORT'));
+		$prestaShop = new prestaShop(Configuration::get('MPAY24_MERCHANT_ID'), Configuration::get('MPAY24_SOAP_PASS'), $mode, Configuration::get('MPAY24_PROXY_HOST'), Configuration::get('MPAY24_PROXY_PORT'), $debug);
 
 		$result = Db::getInstance()->getRow(' SELECT * FROM '._DB_PREFIX_.'orders WHERE `id_order` = '.intval($params['id_order']));
 		$trans = Db::getInstance()->getRow(' SELECT * FROM `'._DB_PREFIX_.'mpay24_order` WHERE `TID` = '.$result['id_order']);
@@ -949,6 +979,11 @@ class mpay24 extends PaymentModule {
 			$mode = true;
 		else
 			$mode = false;
+		
+		if(Configuration::get('MPAY24_DEBUG') == "true")
+			$debug = true;
+		else
+			$debug = false;
 
 		$order = new Order((int)$this->currentOrder);
 
@@ -988,7 +1023,7 @@ class mpay24 extends PaymentModule {
 		);
 				");
 
-		$prestaShop = new prestaShop(Configuration::get('MPAY24_MERCHANT_ID'), Configuration::get('MPAY24_SOAP_PASS'), $mode, Configuration::get('MPAY24_PROXY_HOST'), Configuration::get('MPAY24_PROXY_PORT'));
+		$prestaShop = new prestaShop(Configuration::get('MPAY24_MERCHANT_ID'), Configuration::get('MPAY24_SOAP_PASS'), $mode, Configuration::get('MPAY24_PROXY_HOST'), Configuration::get('MPAY24_PROXY_PORT'), $debug);
 		$prestaShop->setPaymentVariables($cart, $designSettings, $shopSettings, (int)$this->currentOrder);
 		$result = $prestaShop->pay();
 
